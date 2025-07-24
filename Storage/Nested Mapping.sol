@@ -17,12 +17,36 @@ contract MappingStorage {
     }
 
     // Getter function to get the storage slot of a mapping value
-    function getMappingSlot(uint slotOfMapping, uint key) public pure returns (uint slot) {
-    // Mapping storage is computed as keccak256(abi.encode(key, slotOfMapping)).
-    // Although the mapping slot (e.g., slot 1) itself holds no value (typically just zero),
-    // it acts as a seed in the hashing process to deterministically derive a unique slot for each key.
-    // This prevents storage collisions and distributes mapping values across pseudo-random slots.
-    return uint256(keccak256(abi.encode(key, slotOfMapping)));
+     function getMappingSlot(uint slotOfMapping, uint key) public pure returns (uint slot) {
+        return uint256(keccak256(abi.encode(key, slotOfMapping)));
+    }
+
+    /*
+    ─────────────────────────────────────────────────────────────────────────────
+    🔐 Storage Layout Explanation for Nested Mapping: records[a][b]
+    ─────────────────────────────────────────────────────────────────────────────
+
+    Given:
+        mapping(uint => mapping(uint => uint)) public records;
+
+    Solidity stores mappings using the following rule:
+        slot = keccak256(abi.encode(key, baseSlot))
+
+    For nested mappings, this is done in two steps:
+
+    STEP 1: Compute the slot of the inner mapping for key `a`
+        innerMapSlot = keccak256(abi.encode(a, baseSlot)) 
+                     = keccak256(abi.encode(a, 0))  // since `records` is at slot 0
+
+    STEP 2: Compute the slot of the value inside the inner mapping for key `b`
+        finalSlot = keccak256(abi.encode(b, innerMapSlot))
+
+    So the actual value of records[a][b] lives at:
+        keccak256(abi.encode(b, keccak256(abi.encode(a, 0))))
+
+    Use `readStorageSlot(slot)` to retrieve the value at that location.
+    ─────────────────────────────────────────────────────────────────────────────
+    */
 }
 
 }
