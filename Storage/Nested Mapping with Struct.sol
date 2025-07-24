@@ -4,11 +4,11 @@ pragma solidity ^0.8.28;
 
 contract StorageLayout {
     uint256 x = 20;
-    struct table { 
-        uint16 a;
-        uint16 b;
-        uint256 c;
-         }
+    struct table {
+        uint16 a;  // occupies first 16 bits
+        uint16 b;  // occupies next 16 bits (same slot as a due to packing)
+        uint256 c; // starts at next slot (offset +1 from base)
+    }
 
     mapping(uint => mapping(uint => table)) records;
 
@@ -24,12 +24,26 @@ contract StorageLayout {
     }
 
     // Getter function to get the storage slot of a nested mapping inside a struct
-function getMappingSlot(uint slotOfMapping, uint key) public pure returns (uint slot) {
-    // To locate a nested mapping value inside a struct, we compute storage slots step by step:
-    // First, compute keccak256(abi.encode(key1, slotOfMapping)) to find the slot for records[key1].
-    // Then, hash that with the second key: keccak256(abi.encode(key2, <previous_hash>)) to find the base slot of the struct.
-    // Add offset: since a and b are uint16s (packed), they occupy one base slot, say x: c lives at base Slot x + 1
-    return uint256(keccak256(abi.encode(key, slotOfMapping)));
-}
+    function getMappingSlot(uint slotOfMapping, uint key) public pure returns (uint slot) {
+     return uint256(keccak256(abi.encode(key, slotOfMapping)));
+     /*
+         Storage Explanation:
+
+        - Structs **declared** in Solidity (like `table`) are types and do not occupy
+          any storage slot unless **declared and initialised** in the state.
+
+        - So, in this contract:
+            uint256 x                     → slot 0
+            mapping(...) records          → slot 1
+            struct table                  → no slot used (just a type)
+
+        - To access records[key1][key2], we do:
+            Step 1: slotA = keccak256(abi.encode(key1, 1))           // outer mapping
+            Step 2: slotB = keccak256(abi.encode(key2, slotA))       // inner mapping
+            Step 3: fields:
+                a and b → packed in slotB       (uint16 + uint16)
+                c       → slotB + 1             (next 32-byte word)
+        */
+    }
 
 }
