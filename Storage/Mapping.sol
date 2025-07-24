@@ -20,7 +20,7 @@ contract MappingStorage {
     // Getter function to get the storage slot of a mapping value
     function getMappingSlot(uint slotOfMapping, uint key) public pure returns (uint slot) {
         // slotOfMapping: the slot where the mapping is stored (e.g. slot 1)
-        // key: the key you want to use to look up the value
+        // key: the key of the value in the mapping
         // slot: the slot where the value for the given key is stored
         return uint256(keccak256(abi.encode(key, slotOfMapping)));
     }
