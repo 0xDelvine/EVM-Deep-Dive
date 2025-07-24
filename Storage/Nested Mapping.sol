@@ -43,7 +43,6 @@ contract MappingStorage {
         keccak256(abi.encode(b, keccak256(abi.encode(a, 0))))
 
     Use `readStorageSlot(slot)` to retrieve the value at that location.
-    ─────────────────────────────────────────────────────────────────────────────
     */
 }
 
