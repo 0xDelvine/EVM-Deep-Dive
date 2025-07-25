@@ -21,7 +21,7 @@ This repository contains detailed explanations of the core components of the Eth
 
   **Subtopics:**
   - [Uints.sol](./Storage/Uints.sol): Packed and unpacked storage layout of integer types.
-  - [Mappings.sol](./Storage/Mapping.sol): Basic mapping structure and storage slot resolution.
+  - [Mapping.sol](./Storage/Mapping.sol): Basic mapping structure and storage slot resolution.
   - [Nested Mapping.sol](./Storage/Nested%20Mapping.sol): Storage computation for mappings inside mappings.
   - [Nested Mapping with Struct.sol](./Storage/Nested%20Mapping%20with%20Struct.sol): Understanding slot calculation for nested mappings pointing to structs.
 
